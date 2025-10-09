@@ -1,0 +1,93 @@
+Question 16: How to Show this result based on the given details:
+
+True-answers=6
+Wrong -answers=0
+Total-questions=6
+
+Source code:   
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(ResultApp());
+}
+
+class ResultApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: ResultScreen(
+        trueAnswers: 6,
+        wrongAnswers: 0,
+        totalQuestions: 6,
+      ),
+    );
+  }
+}
+
+class ResultScreen extends StatelessWidget {
+  final int trueAnswers;
+  final int wrongAnswers;
+  final int totalQuestions;
+
+  const ResultScreen({
+    required this.trueAnswers,
+    required this.wrongAnswers,
+    required this.totalQuestions,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    double percentage = (trueAnswers / totalQuestions) * 100;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Quiz Results'),
+        backgroundColor: Colors.teal,
+      ),
+      body: Center(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.teal[50],
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.teal.withOpacity(0.3),
+                blurRadius: 8,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Quiz Summary',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.teal[700],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text('✅ Correct Answers: $trueAnswers',
+                  style: TextStyle(fontSize: 18, color: Colors.green[700])),
+              Text('❌ Wrong Answers: $wrongAnswers',
+                  style: TextStyle(fontSize: 18, color: Colors.red[700])),
+              Text('📘 Total Questions: $totalQuestions',
+                  style: TextStyle(fontSize: 18, color: Colors.blue[700])),
+              const SizedBox(height: 20),
+              Text(
+                'Your Score: ${percentage.toStringAsFixed(1)}%',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.teal[800]),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
