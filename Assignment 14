@@ -1,0 +1,105 @@
+Question 19: Create the form which consists firstName, lastName, phoneNumber, email, and all scenarios mentioned below:-
+
+● firstName and lastName should be a minimum character of 5 and a maximum of 15.
+● Add proper validation for email.
+● phoneNumber should be 10 digits and valid.
+
+How will you achieve this problem statement?
+Source code:
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(home: UserForm()));
+}
+
+class UserForm extends StatefulWidget {
+  @override
+  _UserFormState createState() => _UserFormState();
+}
+
+class _UserFormState extends State<UserForm> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('User Form')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              // First Name
+              TextFormField(
+                controller: _firstNameController,
+                decoration: InputDecoration(labelText: 'First Name'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'First Name is required';
+                  if (value.length < 5) return 'Minimum 5 characters required';
+                  if (value.length > 15) return 'Maximum 15 characters allowed';
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              // Last Name
+              TextFormField(
+                controller: _lastNameController,
+                decoration: InputDecoration(labelText: 'Last Name'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Last Name is required';
+                  if (value.length < 5) return 'Minimum 5 characters required';
+                  if (value.length > 15) return 'Maximum 15 characters allowed';
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              // Email
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Email is required';
+                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    return 'Enter a valid email';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              // Phone Number
+              TextFormField(
+                controller: _phoneController,
+                decoration: InputDecoration(labelText: 'Phone Number'),
+                keyboardType: TextInputType.phone,
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Phone number is required';
+                  if (!RegExp(r'^\d{10}$').hasMatch(value)) return 'Enter valid 10-digit phone number';
+                  return null;
+                },
+              ),
+              const SizedBox(height: 24),
+              // Submit Button
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    // All validations passed
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Form Submitted Successfully')),
+                    );
+                  }
+                },
+                child: Text('Submit'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
