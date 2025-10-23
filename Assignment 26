@@ -1,0 +1,148 @@
+Question 2: Create an alertDialog form with name, last name, email, and phone number and store all data in shared preferences and show it in UI after submitting the data. What will be your approach to solving this problem statement?
+Source Code:
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: const HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  String firstName = '';
+  String lastName = '';
+  String email = '';
+  String phone = '';
+
+  String storedFirstName = '';
+  String storedLastName = '';
+  String storedEmail = '';
+  String storedPhone = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  // Load data from SharedPreferences
+  Future<void> _loadData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      storedFirstName = prefs.getString('firstName') ?? '';
+      storedLastName = prefs.getString('lastName') ?? '';
+      storedEmail = prefs.getString('email') ?? '';
+      storedPhone = prefs.getString('phone') ?? '';
+    });
+  }
+
+  // Save data to SharedPreferences
+  Future<void> _saveData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('firstName', firstName);
+    await prefs.setString('lastName', lastName);
+    await prefs.setString('email', email);
+    await prefs.setString('phone', phone);
+    _loadData(); // Refresh UI
+  }
+
+  // Show AlertDialog Form
+  void _showFormDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Enter Details'),
+        content: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'First Name'),
+                  validator: (value) =>
+                      value!.isEmpty ? 'Enter First Name' : null,
+                  onSaved: (value) => firstName = value!,
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Last Name'),
+                  validator: (value) =>
+                      value!.isEmpty ? 'Enter Last Name' : null,
+                  onSaved: (value) => lastName = value!,
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  validator: (value) =>
+                      value!.isEmpty ? 'Enter Email' : null,
+                  onSaved: (value) => email = value!,
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Phone'),
+                  validator: (value) =>
+                      value!.isEmpty ? 'Enter Phone' : null,
+                  onSaved: (value) => phone = value!,
+                  keyboardType: TextInputType.phone,
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
+                _saveData();
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Submit'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Shared Preferences Form')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ElevatedButton(
+              onPressed: _showFormDialog,
+              child: const Text('Open Form'),
+            ),
+            const SizedBox(height: 20),
+            Text('First Name: $storedFirstName'),
+            Text('Last Name: $storedLastName'),
+            Text('Email: $storedEmail'),
+            Text('Phone: $storedPhone'),
+          ],
+        ),
+      ),
+    );
+  }
+}
