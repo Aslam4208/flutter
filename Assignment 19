@@ -1,0 +1,90 @@
+Question 24: You have two buttons A & B . When you click on the A button the image will be shown and you click on the B button then your name, phone number, and email will be shown. How will you achieve this problem statement?
+Source Code:
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: ShowDataExample(),
+    );
+  }
+}
+
+class ShowDataExample extends StatefulWidget {
+  const ShowDataExample({super.key});
+
+  @override
+  State<ShowDataExample> createState() => _ShowDataExampleState();
+}
+
+class _ShowDataExampleState extends State<ShowDataExample> {
+  bool showImage = false; // flag to control what to show
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Show Image or Info Example'),
+        backgroundColor: Colors.teal,
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Buttons Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  setState(() => showImage = true);
+                },
+                child: const Text('Button A (Show Image)'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() => showImage = false);
+                },
+                child: const Text('Button B (Show Info)'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 40),
+
+          // Conditional content
+          if (showImage)
+            Image.asset(
+              'assets/profile_pic.png', // add your image to assets folder
+              width: 180,
+              height: 180,
+              fit: BoxFit.cover,
+            )
+          else
+            Column(
+              children: const [
+                Text(
+                  'Name: Harry Sharma',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Phone: +91 9876543210',
+                  style: TextStyle(fontSize: 18),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Email: harry@example.com',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+}
