@@ -1,0 +1,88 @@
+Question 21: Create a sample drawing app whose background should be white and where the user just draws something.
+Source Code:
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: DrawingPage(),
+    );
+  }
+}
+
+class DrawingPage extends StatefulWidget {
+  const DrawingPage({super.key});
+
+  @override
+  State<DrawingPage> createState() => _DrawingPageState();
+}
+
+class _DrawingPageState extends State<DrawingPage> {
+  // Each line is a list of points drawn by the user
+  List<Offset?> points = [];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Simple Drawing App"),
+        backgroundColor: Colors.blue,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              setState(() => points.clear());
+            },
+          ),
+        ],
+      ),
+      backgroundColor: Colors.white,
+      body: GestureDetector(
+        // Add new points as the user drags their finger
+        onPanUpdate: (details) {
+          setState(() {
+            RenderBox box = context.findRenderObject() as RenderBox;
+            points.add(box.globalToLocal(details.globalPosition));
+          });
+        },
+        // Add a null separator when user lifts finger (to break the line)
+        onPanEnd: (_) => points.add(null),
+        child: CustomPaint(
+          painter: MyPainter(points),
+          size: Size.infinite,
+        ),
+      ),
+    );
+  }
+}
+
+/// Custom painter that uses the inbuilt [Canvas] and [Paint] from Dart UI
+class MyPainter extends CustomPainter {
+  final List<Offset?> points;
+  MyPainter(this.points);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()
+      ..color = Colors.black
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 4.0;
+
+    // Draw continuous lines between points until a null separator is hit
+    for (int i = 0; i < points.length - 1; i++) {
+      if (points[i] != null && points[i + 1] != null) {
+        canvas.drawLine(points[i]!, points[i + 1]!, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant MyPainter oldDelegate) =>
+      oldDelegate.points != points;
+}
