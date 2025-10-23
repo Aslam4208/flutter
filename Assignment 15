@@ -1,0 +1,101 @@
+Question 20: Is there any way to rotate an image clock clockwise and anti-clockwise by clicking on a single button?
+Source Code:
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Rotating Clock Demo',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const RotatingClockPage(),
+    );
+  }
+}
+
+class RotatingClockPage extends StatefulWidget {
+  const RotatingClockPage({super.key});
+  @override
+  State<RotatingClockPage> createState() => _RotatingClockPageState();
+}
+
+class _RotatingClockPageState extends State<RotatingClockPage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _forwardTurns;
+  bool _isClockwise = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Controller that runs from 0.0 -> 1.0 repeatedly
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    );
+
+    // Animation mapping controller's 0..1 to a full turn (0..1 turns)
+    // RotationTransition interprets "turns" such that 1.0 == 360°
+    _forwardTurns = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+
+    // Start repeating forever
+    _controller.repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _toggleDirection() {
+    setState(() {
+      _isClockwise = !_isClockwise;
+      // We keep the controller repeating — only the animation passed to
+      // RotationTransition changes between forward and reversed.
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // If _isClockwise is true use the forward animation,
+    // otherwise wrap it with ReverseAnimation to invert direction.
+    final Animation<double> turnsAnimation =
+        _isClockwise ? _forwardTurns : ReverseAnimation(_forwardTurns);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Rotate Clock - single button toggle')),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // The RotationTransition widget (from hint)
+            RotationTransition(
+              turns: turnsAnimation,
+              child: SizedBox(
+                width: 220,
+                height: 220,
+                child: Image.asset(
+                  'assets/clock.png', // replace with your asset or use Image.network(...)
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: _toggleDirection,
+              icon: Icon(
+                _isClockwise ? Icons.rotate_right : Icons.rotate_left,
+              ),
+              label: Text(_isClockwise ? 'Rotate: Clockwise' : 'Rotate: Anti-clockwise'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
